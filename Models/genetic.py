@@ -1,4 +1,6 @@
-
+import random
+import copy
+import numpy as np
 
 def select_agents(agent_results, fitness_model, percent):
     num_agents = int(len(agent_results) * percent)
@@ -15,8 +17,31 @@ def select_agents(agent_results, fitness_model, percent):
 
     return best_agents
 
-def crossover_agents(agent_models):
-    pass
+def crossover_agents(agent_models, times_pair):
+    new_models = []
+    for i in range(times_pair):
+        curr_models = copy.deepcopy(agent_models)
+        random.shuffle(curr_models)
 
-def mutate_agents(agent_models):
-    pass
+        for j in range(1, len(curr_models), 2):
+            n1, p1 = curr_models[j].named_parameters()
+            n2, p2 = curr_models[j - 1].named_parameters()
+
+            for k in range(1, len(p1), 2):
+                temp = p1[k]
+                p1[k] = p2[k]
+                p2[k] = temp
+
+            new_models.append(copy.deepcopy(curr_models[j]))
+            new_models.append(copy.deepcopy(curr_models[j - 1]))
+
+
+
+def mutate_agents(agent_models, width):
+    for agent in agent_models:
+        curr_params = agent.parameters()
+        for name, param in agent.named_parameters():
+            size = len(param)
+            mutation = np.random.normal(scale=width, size=size)
+            param += mutation
+
