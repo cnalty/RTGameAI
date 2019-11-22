@@ -4,17 +4,21 @@ from Models.LookAround.look import LookModel
 
 def main():
     models = [LookModel() for _ in range(10)]
-    for model in models:
-        model.eval()
-
+    i = 1
     for param in models[0].parameters():
-        print(param.data)
-        break
+        print(param)
+        if i % 2 == 0:
+            break
+        i += 1
+    i += 1
+    new_models = genetic.crossover_agents(models, 1)
+    for param in new_models[0].parameters():
+        print(param)
+        if i % 2 == 0:
+            break
+        i += 1
 
-    genetic.mutate_agents(models, 1)
-    for param in models[0].parameters():
-        print(param.data)
-        break
+
 
 
 if __name__ == "__main__":

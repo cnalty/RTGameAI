@@ -18,23 +18,29 @@ def select_agents(agent_results, fitness_model, percent):
 
     return best_agents
 
-def crossover_agents(agent_models, times_pair):
+def crossover_agents(agent_models, times_pair=2):
     new_models = []
     for i in range(times_pair):
         curr_models = copy.deepcopy(agent_models)
-        random.shuffle(curr_models)
+        #random.shuffle(curr_models)
 
         for j in range(1, len(curr_models), 2):
-            n1, p1 = curr_models[j].named_parameters()
-            n2, p2 = curr_models[j - 1].named_parameters()
+            i = 0
+            for param1, param2 in zip(curr_models[j].parameters(), curr_models[j - 1].parameters()):
+                if i % 2 == 0:
+                    print("swap")
+                    temp = param1
+                    print(param1)
+                    param1 = param2
+                    print(param1)
+                    param2 = temp
+                i += 1
+            new_models.append(curr_models[j - 1])
+            new_models.append(curr_models[j])
 
-            for k in range(1, len(p1), 2):
-                temp = p1[k]
-                p1[k] = p2[k]
-                p2[k] = temp
 
-            new_models.append(copy.deepcopy(curr_models[j]))
-            new_models.append(copy.deepcopy(curr_models[j - 1]))
+
+    return new_models
 
 
 ''' Takes in a list of agents and a standard deviation to perform a mutation on each agent.
