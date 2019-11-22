@@ -1,5 +1,6 @@
 import random
 import copy
+import torch
 import numpy as np
 
 def select_agents(agent_results, fitness_model, percent):
@@ -36,12 +37,23 @@ def crossover_agents(agent_models, times_pair):
             new_models.append(copy.deepcopy(curr_models[j - 1]))
 
 
-
+''' Takes in a list of agents and a standard deviation to perform a mutation on each agent.
+    Each agent receives an adjustment to all its weights given by a gaussian distribution
+    with the std dev provided.'''
+# Tested and working
 def mutate_agents(agent_models, width):
     for agent in agent_models:
         curr_params = agent.parameters()
-        for name, param in agent.named_parameters():
-            size = len(param)
-            mutation = np.random.normal(scale=width, size=size)
-            param += mutation
+        for param in agent.parameters():
+            shape = param.size()
+
+            if len(shape) > 1:
+                for sub_param in param:
+                    size = len(sub_param)
+                    mutation = np.random.normal(scale=width, size=size)
+                    param += torch.tensor(mutation)
+            else:
+                size = len(param)
+                mutation = np.random.normal(scale=width, size=size)
+                param += torch.tensor(mutation)
 
