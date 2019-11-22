@@ -22,18 +22,16 @@ def crossover_agents(agent_models, times_pair=2):
     new_models = []
     for i in range(times_pair):
         curr_models = copy.deepcopy(agent_models)
-        #random.shuffle(curr_models)
+        random.shuffle(curr_models)
 
         for j in range(1, len(curr_models), 2):
             i = 0
             for param1, param2 in zip(curr_models[j].parameters(), curr_models[j - 1].parameters()):
                 if i % 2 == 0:
                     print("swap")
-                    temp = param1
-                    print(param1)
-                    param1 = param2
-                    print(param1)
-                    param2 = temp
+                    temp = param1.data
+                    param1.data = param2.data
+                    param2.data = temp
                 i += 1
             new_models.append(curr_models[j - 1])
             new_models.append(curr_models[j])
