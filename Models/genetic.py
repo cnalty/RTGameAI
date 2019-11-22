@@ -11,10 +11,10 @@ def select_agents(agent_results, fitness_model, percent):
             best_agents.append((i, fitness_model(agent_results[i])))
         else:
             list.sort(best_agents, key=lambda x: x[1])
-            curr_score = fitness_model(agent_results)
+            curr_score = fitness_model(agent_results[i])
             if curr_score > best_agents[0][1]:
-                list.remove(0)
-                list.append((i, curr_score))
+                best_agents.pop(0)
+                best_agents.append((i, curr_score))
 
     return best_agents
 
