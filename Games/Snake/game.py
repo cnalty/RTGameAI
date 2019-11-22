@@ -66,7 +66,7 @@ class Snake():
     def game_loop(self):
         while(self.running):
             pygame.event.pump()
-            input = self.inputs(self.get_image())
+            input = self.inputs(self.get_image(), self.player.get_head(), self.apple.get_pos())
 
             # K_LEFT = 276
             # K_RIGHT = 275

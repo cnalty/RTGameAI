@@ -1,7 +1,7 @@
 import pygame
 from game import Snake
 
-def buttons(image):
+def buttons(image, head, apple):
     return pygame.key.get_pressed()
 
 def main():
