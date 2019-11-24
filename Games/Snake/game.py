@@ -1,31 +1,34 @@
 import pygame
-from player import Player
+from Games.Snake.player import Player
 from random import randint
 import time
+import copy
 
 class Snake():
     windowWidth = 800
     windowHeight = 800
     player = 0
 
-    def __init__(self, input_source, move_keys, game_speed=0.25):
+    def __init__(self, input_source, move_keys, snake_im, food_im, game_speed=0.25):
         pygame.init()
         self.started = True
         self.surface = pygame.display.set_mode((self.windowWidth, self.windowHeight))
-        pygame.display.set_caption("Snake")
+        #pygame.display.set_caption("Snake")
         self.started = False
         self.running = True
-        self.player = Player("snake.png")
-        self.apple = Apple("food.png", self.new_pos())
+        self.player = Player(snake_im)
+        self.apple = Apple(food_im, self.new_pos())
         self.inputs = input_source
         self.closeness = 1000
+        self.moves_away = 0
         self.moves = 0
         self.move_keys = move_keys
         self.game_speed = game_speed
+        self.food_im = food_im
 
     def ate_apple(self):
         if self.apple.get_pos() == tuple(self.player.get_head()):
-            self.apple = Apple("food.png", self.new_pos())
+            self.apple = Apple(self.food_im, self.new_pos())
             return True
         else:
             return False
@@ -65,9 +68,12 @@ class Snake():
 
     def game_loop(self):
         while(self.running):
+            if self.moves > 150:
+                break
             pygame.event.pump()
-            input = self.inputs(self.get_image(), self.player.get_head(), self.apple.get_pos())
+            input = self.inputs(self.get_image(), self.player.get_pos(), self.apple.get_pos())
 
+            start_dist = self.dist(self.player.get_head(), self.apple.get_pos())
             # K_LEFT = 276
             # K_RIGHT = 275
             # K_UP = 273
@@ -93,21 +99,39 @@ class Snake():
             self.surface.fill((0,0,0))
             self.player.draw(self.surface)
             self.apple.draw(self.surface)
+            #self.draw_lines()
             pygame.display.flip()
             if self.is_dead():
                 self.running = False
             self.moves += 1
+            end_dist = self.dist(self.player.get_head(), self.apple.get_pos())
+            if end_dist > start_dist:
+                self.moves_away += 1
             pygame.display.update()
             time.sleep(self.game_speed)
 
         pygame.quit()
-        return len(self.player), self.closeness, self.moves
+        return len(self.player), self.closeness, self.moves, self.moves_away
 
 
+    def draw_lines(self):
+        start = copy.deepcopy(self.player.get_head())
+        start[0] += 17
+        start[1] += 17
+
+        pygame.draw.line(self.surface, (225, 0, 0), start, (0, start[1]))
+        pygame.draw.line(self.surface, (225, 0, 0), start, (800, start[1]))
+        pygame.draw.line(self.surface, (225, 0, 0), start, (start[0], 0))
+        pygame.draw.line(self.surface, (225, 0, 0), start, (start[0], 800))
 
 
+    def hypot(self, a):
+        return (a ** 2 + a ** 2) ** 0.5
 
-
+    def dist(self, a, b):
+        xd = a[0] - b[0]
+        yd = a[1] - b[1]
+        return (xd**2 + yd**2)**0.5
 
 
 class Apple():
