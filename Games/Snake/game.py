@@ -58,8 +58,8 @@ class Snake():
         for i in range(len(pos) - 1):
             if pos[i] == head:
                 return True
-            if pos[i][0] <= 0 or pos[i][0] >= self.windowWidth or \
-                pos[i][1] <= 0 or pos[i][1] >= self.windowHeight:
+            if pos[i][0] <= 0 or pos[i][0] >= self.windowWidth - 40 or \
+                pos[i][1] <= 0 or pos[i][1] >= self.windowHeight - 40:
                     return True
         return False
 
@@ -99,7 +99,7 @@ class Snake():
             self.surface.fill((0,0,0))
             self.player.draw(self.surface)
             self.apple.draw(self.surface)
-            #self.draw_lines()
+            self.draw_lines()
             pygame.display.flip()
             if self.is_dead():
                 self.running = False

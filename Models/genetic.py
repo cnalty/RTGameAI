@@ -47,13 +47,21 @@ def crossover2(agent_models, times_pair=2):
         random.shuffle(curr_models)
 
         for j in range(1, len(curr_models), 2):
-            i = 0
             for param1, param2 in zip(curr_models[j].parameters(), curr_models[j - 1].parameters()):
-                swap_point = random.randint(0, len(param1.data) - 1)
-                for i in range(swap_point):
-                    param1.data[i] = param2.data[i]
-                for i in range(swap_point, len(param1.data)):
-                    param2.data[i] = param1.data[i]
+                if(len(param1.size()) > 1):
+                    for k in range(len(param1.data)):
+                        swap_point = random.randint(0, len(param1.data[k]) - 1)
+                        for l in range(swap_point):
+                            param1.data[k][l] = param2.data[k][l]
+                        for l in range(swap_point, len(param1.data[k])):
+                            param2.data[k][l] = param1.data[k][l]
+                else:
+                    swap_point = random.randint(0, len(param1.data) - 1)
+                    for l in range(swap_point):
+                        param1.data[l] = param2.data[l]
+                    for l in range(swap_point, len(param1.data)):
+                        param2.data[l] = param1.data[l]
+
             new_models.append(curr_models[j - 1])
             new_models.append(curr_models[j])
 

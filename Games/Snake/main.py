@@ -6,7 +6,7 @@ def buttons(image, head, apple):
 
 def main():
     keys = {pygame.K_LEFT: "L", pygame.K_RIGHT: "R", pygame.K_UP: "U", pygame.K_DOWN: "D", pygame.K_ESCAPE: "E"}
-    game = Snake(buttons, keys, "snake.png", "apple.png")
+    game = Snake(buttons, keys, "../../Games/Snake/snake.png", "../../Games/Snake/food.png")
     print(game.game_loop())
 
 
