@@ -12,7 +12,7 @@ def main():
     pop_size = 50
     curr_models = [ConvNet() for _ in range(pop_size)]
 
-    for gen in range(20):
+    for gen in range(200):
         print("---------" + str(gen) + "---------")
         for i in range(int((len(curr_models) + 1) / num_threads)):
             threads = []
@@ -38,6 +38,7 @@ def main():
     xs = [i for i in range(len(gen_fitness))]
     plt.plot(xs, gen_fitness)
     plt.show()
+    torch.save(curr_models[-1].state_dict(), "snake.pth.tar")
 
 
 def train_loop(model):

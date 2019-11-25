@@ -12,7 +12,7 @@ def main():
     pop_size = 100
     curr_models = [LookModel() for _ in range(pop_size)]
 
-    for gen in range(70):
+    for gen in range(500):
         print("---------" + str(gen) + "---------")
         for i in range(int((len(curr_models) + 1) / num_threads)):
             threads = []
@@ -37,17 +37,18 @@ def main():
 
         genetic.mutate_agents(new_models, 0.5, 0.05)
         curr_models = new_models
+        xs = [i for i in range(len(gen_fitness))]
+        plt.plot(xs, gen_fitness)
+        plt.show()
 
-    xs = [i for i in range(len(gen_fitness))]
-    plt.plot(xs, gen_fitness)
-    plt.show()
+    torch.save(curr_models[-1].state_dict(), "snake.pth.tar")
 
 def train_loop(model):
-    keys = {0: "L", 1: "R", 2: "U", 3: "D", 4: "E"}
+    keys = {0: "R", 1: "L", 2: "D", 3: "U", 4: "E"}
     curr_game = game.Snake(model.choose_move, keys,
                                    "../../Games/Snake/snake.png", "../../Games/Snake/food.png",
                                     game_speed=0)
-    model.fitness = model.fitness_model(curr_game.game_loop())
+    curr_game.game_loop()
 
 
 
@@ -57,11 +58,6 @@ def chunk(lst, size):
         chunks.append(lst[i:i + size])
 
     return chunks
-
-
-
-
-
 
 
 

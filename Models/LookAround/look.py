@@ -12,7 +12,7 @@ class LookModel(nn.Module):
         #self.fc3 = nn.Linear(6, 6)
         self.fc4 = nn.Linear(6, 4) # 4 directions for output layer
 
-        self.fitness = None
+        self.fitness = 0
 
         for param in self.parameters():
             nn.init.normal_(param.data, 0, 1)
@@ -52,15 +52,19 @@ class LookModel(nn.Module):
 
         if head[0] >= 760:
             directions[0] = 0 # East Wall
+
             #print("wall east")
         if head[0] <= 0:
             directions[1] = 0 # West Wall
+
             #print("wall west")
         if head[1] >= 760:
             directions[2] = 0 # South Wall
+
             #print("wall south")
         if head[1] <= 0:
             directions[3] = 0 # North Wall
+
             #print("wall north")
 
         if apple[1] == head[1]:
@@ -94,6 +98,20 @@ class LookModel(nn.Module):
                 moves[i] = True
             else:
                 moves[i] = False
+
+
+        for i in range(len(moves)):
+            if moves[i] and directions[i] == 0:
+                self.fitness -= 100
+            elif not moves[i] and directions[i] == 0:
+                self.fitness += 100
+
+            if not moves[i] and directions[i + 4] == 1:
+                self.fitness -= 1000
+
+            elif directions[i + 4] == 1:
+                self.fitness += 2000
+
 
         moves.append(False)
         return moves
