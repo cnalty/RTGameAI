@@ -39,6 +39,14 @@ class Snake():
 
         return ((a_pos[0] - p_pos[0])**2 + (a_pos[1] - p_pos[1])**2)**(0.5)
 
+    def see_apple(self):
+        app_pos = self.apple.get_pos()
+        head = self.player.get_head()
+        if head[0] == app_pos[0]:
+            return True
+        if head[1] == app_pos[1]:
+            return True
+        return False
 
     def new_pos(self):
         overlap = True
@@ -58,13 +66,13 @@ class Snake():
         for i in range(len(pos) - 1):
             if pos[i] == head:
                 return True
-            if pos[i][0] <= 0 or pos[i][0] >= self.windowWidth - 40 or \
-                pos[i][1] <= 0 or pos[i][1] >= self.windowHeight - 40:
+            if pos[i][0] < 0 or pos[i][0] >= self.windowWidth or \
+                pos[i][1] < 0 or pos[i][1] >= self.windowHeight:
                     return True
         return False
 
     def get_image(self):
-        pygame.surfarray.array3d(self.surface)
+        return pygame.surfarray.array3d(self.surface)
 
     def game_loop(self):
         while(self.running):
@@ -72,7 +80,7 @@ class Snake():
                 break
             pygame.event.pump()
             input = self.inputs(self.get_image(), self.player.get_pos(), self.apple.get_pos())
-
+            saw_apple = self.see_apple()
             start_dist = self.dist(self.player.get_head(), self.apple.get_pos())
             # K_LEFT = 276
             # K_RIGHT = 275
@@ -99,13 +107,13 @@ class Snake():
             self.surface.fill((0,0,0))
             self.player.draw(self.surface)
             self.apple.draw(self.surface)
-            self.draw_lines()
+            #self.draw_lines()
             pygame.display.flip()
             if self.is_dead():
                 self.running = False
             self.moves += 1
             end_dist = self.dist(self.player.get_head(), self.apple.get_pos())
-            if end_dist > start_dist:
+            if end_dist > start_dist and saw_apple:
                 self.moves_away += 1
             pygame.display.update()
             time.sleep(self.game_speed)

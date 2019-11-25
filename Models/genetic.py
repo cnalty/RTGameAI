@@ -2,72 +2,50 @@ import random
 import copy
 import torch
 import numpy as np
+import math
 
-def select_agents(agent_results, fitness_model, percent):
-    num_agents = int(len(agent_results) * percent)
+def select_agents(fits, percent):
+    num_agents = math.ceil(len(fits) * percent)
     best_agents = []
-    for i in range(len(agent_results)):
+    for i in range(len(fits)):
         if len(best_agents) < num_agents:
-            best_agents.append((i, fitness_model(agent_results[i])))
+            best_agents.append((i, fits[i]))
         else:
             list.sort(best_agents, key=lambda x: x[1])
-            curr_score = fitness_model(agent_results[i])
-            if curr_score > best_agents[0][1]:
+            if fits[i] > best_agents[0][1]:
                 best_agents.pop(0)
-                best_agents.append((i, curr_score))
+                best_agents.append((i, fits[i]))
 
+    list.sort(best_agents, key=lambda  x: x[1])
     return best_agents
 
-def crossover_agents(agent_models, times_pair=2):
-    new_models = []
-    for i in range(times_pair):
-        curr_models = copy.deepcopy(agent_models)
-        random.shuffle(curr_models)
+def crossover(parents, num_childs, network_class):
+    children = []
+    for _ in range(num_childs):
+        curr_child = network_class()
+        curr_parents = random.sample(parents, 2)
+        for param1, param2, param3 in zip(curr_parents[0].parameters(), curr_parents[1].parameters(),
+                                          curr_child.parameters()):
+            datas = crossover_layer(param1, param2, param3)
+            if len(datas) > 1:
+                param3.data = torch.stack(datas)
+            else:
+                param3.data = datas[0]
+        children.append(curr_child)
 
-        for j in range(1, len(curr_models), 2):
-            i = 0
-            for param1, param2 in zip(curr_models[j].parameters(), curr_models[j - 1].parameters()):
-                if i % 2 == 0:
-                    #print("swap")
-                    temp = param1.data
-                    param1.data = param2.data
-                    param2.data = temp
-                i += 1
-            new_models.append(curr_models[j - 1])
-            new_models.append(curr_models[j])
+    return children
 
-
-
-    return new_models
-
-def crossover2(agent_models, times_pair=2):
-    new_models = []
-    for i in range(times_pair):
-        curr_models = copy.deepcopy(agent_models)
-        random.shuffle(curr_models)
-
-        for j in range(1, len(curr_models), 2):
-            for param1, param2 in zip(curr_models[j].parameters(), curr_models[j - 1].parameters()):
-                if(len(param1.size()) > 1):
-                    for k in range(len(param1.data)):
-                        swap_point = random.randint(0, len(param1.data[k]) - 1)
-                        for l in range(swap_point):
-                            param1.data[k][l] = param2.data[k][l]
-                        for l in range(swap_point, len(param1.data[k])):
-                            param2.data[k][l] = param1.data[k][l]
-                else:
-                    swap_point = random.randint(0, len(param1.data) - 1)
-                    for l in range(swap_point):
-                        param1.data[l] = param2.data[l]
-                    for l in range(swap_point, len(param1.data)):
-                        param2.data[l] = param1.data[l]
-
-            new_models.append(curr_models[j - 1])
-            new_models.append(curr_models[j])
-
-    return new_models
-
-
+def crossover_layer(p1, p2, c):
+    shape = p1.size()
+    if len(shape) > 1:
+        datas = []
+        for s1, s2, sc in zip(p1, p2, c):
+            datas.extend(crossover_layer(s1, s2, sc))
+        return datas
+    else:
+        c = random.choice([p1.data, p2.data])
+        #print(c)
+        return [c]
 
 ''' Takes in a list of agents and a standard deviation to perform a mutation on each agent.
     Each agent receives an adjustment to all its weights given by a gaussian distribution
@@ -75,19 +53,57 @@ def crossover2(agent_models, times_pair=2):
 # Tested and working
 def mutate_agents(agent_models, width, rate):
     for agent in agent_models:
-        curr_params = agent.parameters()
         for param in agent.parameters():
-            if random.random() > rate:
-                continue
-            shape = param.size()
+            mutate_layer(param, width, rate)
 
-            if len(shape) > 1:
-                for sub_param in param:
-                    size = len(sub_param)
-                    mutation = np.random.normal(scale=width, size=size)
-                    param += torch.tensor(mutation).float()
-            else:
-                size = len(param)
-                mutation = np.random.normal(scale=width, size=size)
-                param += torch.tensor(mutation).float()
 
+def mutate_layer(param, width, rate):
+    shape = param.size()
+    if len(shape) > 1:
+        for sub_param in param:
+            mutate_layer(sub_param, width, rate)
+    else:
+        for i in range(len(param)):
+            if random.random() < rate:
+                mutation = np.random.normal(scale=width)
+                param[i] += mutation
+
+
+def main():
+    test_layer1 = torch.nn.Linear(4, 5)
+    test_layer2 = torch.nn.Linear(4, 5)
+    test_child = torch.nn.Linear(4, 5)
+
+    for param in test_layer1.parameters():
+        print(param.data)
+        print("---------")
+
+    # for param in test_layer2.parameters():
+    #     print(param.data)
+    #     print("---------")
+
+    for param1, param2, param3 in zip(test_layer1.parameters(), test_layer2.parameters(),
+                                      test_child.parameters()):
+        datas = crossover_layer(param1, param2, param3)
+
+        if len(datas) > 1:
+            param3.data = torch.stack(datas)
+        else:
+            param3.data = datas[0]
+
+    for param in test_layer1.parameters():
+        print(param.data)
+        print("----------")
+
+    # for param in test_layer2.parameters():
+    #     print(param.data)
+    #     print("---------")
+
+
+
+    for param in test_child.parameters():
+        print(param.data)
+
+
+if __name__ == "__main__":
+    main()
