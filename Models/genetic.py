@@ -162,12 +162,17 @@ def mutate_layer(param, width, rate, bounded):
     shape = param.size()
     if len(shape) > 1:
         for sub_param in param:
-            mutate_layer(sub_param, width, rate)
+            mutate_layer(sub_param, width, rate, bounded)
     else:
         for i in range(len(param)):
             if random.random() < rate:
                 mutation = np.random.normal(scale=width)
                 param[i] += mutation
+                if bounded:
+                    if param[i] > 1:
+                        param[i] = 1
+                    elif param[i] < -1:
+                        param[i] = -1
 
 
 def count_parameters(model):
@@ -202,12 +207,12 @@ def test_crossover():
 
 def main():
     from Models.LookAround.look8 import LookModel8
-    test_parent = LookModel8()
-    test_parent2 = LookModel8()
-    child = random_dict_crossover([test_parent, test_parent2], 1, LookModel8)
-    print(test_parent.state_dict()['fc1.bias'])
-    print(test_parent2.state_dict()['fc1.bias'])
-    print(child[0].state_dict()['fc1.bias'])
+    test_layer = torch.nn.Linear(4, 4)
+
+    for param in test_layer.parameters():
+        print(param)
+        mutate_layer(param, 0.2, 1, True)
+        print(param)
 
 if __name__ == "__main__":
     main()

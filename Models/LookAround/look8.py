@@ -15,7 +15,7 @@ class LookModel8(nn.Module):
         self.fitness = 0
 
         for param in self.parameters():
-            nn.init.normal_(param.data, 0, 1)
+            nn.init.uniform_(param.data, -1, 1)
             param.requires_grad = False
 
     def forward(self, x):
@@ -77,7 +77,7 @@ class LookModel8(nn.Module):
         closeness = fitness_params[1]
         turns = fitness_params[2]
         away = fitness_params[3]
-        score = score - 2
+
 
         score = min(10, score)
 

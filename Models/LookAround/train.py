@@ -29,8 +29,9 @@ def main():
         fitnesses = [x.fitness for x in curr_models]
         list.sort(fitnesses)
         gen_fitness.append(sum(fitnesses)/float(len(fitnesses)))
-        print(fitnesses)
+
         winners = genetic.select_agents(fitnesses, 0.05)
+        print(winners)
         win_models = [curr_models[winners[i][0]] for i in range(len(winners))]
         best = win_models[-1]
         new_models = genetic.crossover(win_models, pop_size - 1, LookModel8)
