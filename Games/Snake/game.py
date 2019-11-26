@@ -103,14 +103,15 @@ class Snake():
 
             if self.ate_apple():
                 self.player.grow()
+            if self.is_dead():
+                self.running = False
 
             self.surface.fill((0,0,0))
             self.player.draw(self.surface)
             self.apple.draw(self.surface)
             #self.draw_lines()
             pygame.display.flip()
-            if self.is_dead():
-                self.running = False
+
             self.moves += 1
             end_dist = self.dist(self.player.get_head(), self.apple.get_pos())
             if end_dist > start_dist and saw_apple:

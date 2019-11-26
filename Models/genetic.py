@@ -70,9 +70,9 @@ def mutate_layer(param, width, rate):
 
 
 def main():
-    test_layer1 = torch.nn.Linear(4, 5)
-    test_layer2 = torch.nn.Linear(4, 5)
-    test_child = torch.nn.Linear(4, 5)
+    test_layer1 = torch.nn.Linear(24, 18)
+    test_layer2 = torch.nn.Linear(24, 18)
+    test_child = torch.nn.Linear(24,18)
 
     for param in test_layer1.parameters():
         print(param.data)
