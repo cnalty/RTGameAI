@@ -13,7 +13,7 @@ def main():
     pop_size = 100
     curr_models = [LookModel8() for _ in range(pop_size)]
 
-    for gen in range(5000):
+    for gen in range(100):
         print("---------" + str(gen) + "---------")
         for i in range(int((len(curr_models) + 1) / num_threads)):
             threads = []
@@ -30,10 +30,10 @@ def main():
         list.sort(fitnesses)
         gen_fitness.append(sum(fitnesses)/float(len(fitnesses)))
         print(fitnesses)
-        winners = genetic.select_agents(fitnesses, 0.1)
+        winners = genetic.select_agents(fitnesses, 0.05)
         win_models = [curr_models[winners[i][0]] for i in range(len(winners))]
         best = win_models[-1]
-        new_models = genetic.random_dict_crossover(win_models, pop_size - 1, LookModel8)
+        new_models = genetic.crossover(win_models, pop_size - 1, LookModel8)
 
         genetic.mutate_agents(new_models, 0.2, 0.02)
         new_models.append(best)

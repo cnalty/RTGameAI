@@ -144,17 +144,21 @@ def random_dict_helper(p1, p2):
             vect.append(random.choice([p1[i], p2[i]]))
         return vect
 
+
+def flat_crossover(parents, num_childs, network_class):
+    pass
+
 ''' Takes in a list of agents and a standard deviation to perform a mutation on each agent.
     Each agent receives an adjustment to all its weights given by a gaussian distribution
     with the std dev provided.'''
 # Tested and working
-def mutate_agents(agent_models, width, rate):
+def mutate_agents(agent_models, width, rate,bounded=True):
     for agent in agent_models:
         for param in agent.parameters():
-            mutate_layer(param, width, rate)
+            mutate_layer(param, width, rate, bounded)
 
 
-def mutate_layer(param, width, rate):
+def mutate_layer(param, width, rate, bounded):
     shape = param.size()
     if len(shape) > 1:
         for sub_param in param:
