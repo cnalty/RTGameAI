@@ -77,12 +77,15 @@ class LookModel8(nn.Module):
         closeness = fitness_params[1]
         turns = fitness_params[2]
         away = fitness_params[3]
+        score = score - 2
 
-        fitness = 20 * (score - 3)
+        score = min(10, score)
 
-        fitness += turns * 4
+        fitness = 2 ** score
 
-        #fitness -= away * away
+        fitness += turns ** 1.5
+
+        fitness -= away ** 1.5
 
         return fitness
 

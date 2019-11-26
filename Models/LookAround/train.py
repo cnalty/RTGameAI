@@ -30,13 +30,13 @@ def main():
         list.sort(fitnesses)
         gen_fitness.append(sum(fitnesses)/float(len(fitnesses)))
         print(fitnesses)
-        winners = genetic.select_agents(fitnesses, 0.25)
+        winners = genetic.select_agents(fitnesses, 0.1)
         win_models = [curr_models[winners[i][0]] for i in range(len(winners))]
         new_models = genetic.crossover_2(win_models, pop_size, LookModel8)
 
 
 
-        genetic.mutate_agents(new_models, 0.2, 0.025)
+        genetic.mutate_agents(new_models, 0.2, 0.02)
         curr_models = new_models
         xs = [i for i in range(len(gen_fitness))]
         if len(gen_fitness) % 10 == 0:

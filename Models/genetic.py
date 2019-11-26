@@ -78,7 +78,7 @@ def crossover_weight(p1, p2, c, seen, cross):
                     new.append(p1[i])
                 else:
                     new.append(p2[i])
-            return [torch.tensor(new).cuda()]
+            return [torch.tensor(new)]
         elif seen < cross:
             return [p1]
         else:
