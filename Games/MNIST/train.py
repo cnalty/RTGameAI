@@ -1,8 +1,8 @@
 import torch.utils.data
 from torch import nn
 from torch.autograd import Variable
-from Dataset import Minst_Dataset
-from model import CharNet
+from Games.MNIST.dataset import Mnist_Dataset
+from Models.CharNet.charnet import CharNet
 import torch.optim.lr_scheduler
 import Models.genetic as genetic
 
@@ -13,12 +13,13 @@ LR_DECAY = 10
 
 def main():
     # Load model, dataset and set up gradient decent
-    pop_size = 50
-    models = [CharNet(10) for _ in range(pop_size)]
+    pop_size = 25
+    models = [CharNet() for _ in range(pop_size)]
     for model in models:
         model.cuda()
+        model.eval()
 
-    dataset = Minst_Dataset('train.csv')
+    dataset = Mnist_Dataset('train.csv')
 
     train_loader = torch.utils.data.DataLoader(
         dataset,
@@ -35,17 +36,19 @@ def main():
 
     # Training Loop
     for epoch in range(NUM_EPOCHS):
+        print("----{}-----".format(epoch))
         losses = []
         for model in models:
             curr_loss = train(model, train_loader, criterion)
-            losses.append(curr_loss)
+            losses.append(1000 / curr_loss)
         selections = genetic.select_agents(losses, 0.2)
         parents = [models[selections[i][0]] for i in range(len(selections))]
-        new_models = genetic.crossover(parents, pop_size, CharNet)
+        new_models = genetic.crossover_2(parents, pop_size, CharNet)
         genetic.mutate_agents(new_models, 0.1, 0.01)
         models = new_models
         for model in models:
             model.cuda()
+            model.eval()
 
 
     # Save the model

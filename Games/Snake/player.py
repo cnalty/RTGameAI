@@ -16,19 +16,19 @@ class Player():
 
     def update(self, key):
         if key == "U":
-            if self.yspeed != self.movement_speed:
+            #if self.yspeed != self.movement_speed:
                 self.yspeed = -1 * self.movement_speed
                 self.xspeed = 0
         elif key == "D":
-            if self.yspeed != -1 * self.movement_speed:
+            #if self.yspeed != -1 * self.movement_speed:
                 self.yspeed = self.movement_speed
                 self.xspeed = 0
         elif key == "L":
-            if self.xspeed != self.movement_speed:
+            #if self.xspeed != self.movement_speed:
                 self.yspeed = 0
                 self.xspeed = -1 * self.movement_speed
         elif key == "R":
-            if self.xspeed != -1 * self.movement_speed:
+            #if self.xspeed != -1 * self.movement_speed:
                 self.yspeed = 0
                 self.xspeed = self.movement_speed
 

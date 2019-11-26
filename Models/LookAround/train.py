@@ -13,7 +13,7 @@ def main():
     pop_size = 100
     curr_models = [LookModel8() for _ in range(pop_size)]
 
-    for gen in range(500):
+    for gen in range(5000):
         print("---------" + str(gen) + "---------")
         for i in range(int((len(curr_models) + 1) / num_threads)):
             threads = []
@@ -27,24 +27,24 @@ def main():
 
 
         fitnesses = [x.fitness for x in curr_models]
+        list.sort(fitnesses)
         gen_fitness.append(sum(fitnesses)/float(len(fitnesses)))
         print(fitnesses)
-        winners = genetic.select_agents(fitnesses, 0.2)
-        print(winners)
+        winners = genetic.select_agents(fitnesses, 0.25)
         win_models = [curr_models[winners[i][0]] for i in range(len(winners))]
-        best = win_models[-1]
-        new_models = genetic.crossover(win_models, pop_size - 1, LookModel8)
-        new_models.append(best)
+        new_models = genetic.crossover_2(win_models, pop_size, LookModel8)
 
-        genetic.mutate_agents(new_models, 0.2, 0.05)
+
+
+        genetic.mutate_agents(new_models, 0.2, 0.025)
         curr_models = new_models
         xs = [i for i in range(len(gen_fitness))]
         if len(gen_fitness) % 10 == 0:
-            plt.plot(xs, gen_fitness)
-            plt.show()
             torch.save(curr_models[-1].state_dict(), "snake.pth.tar")
 
     torch.save(curr_models[-1].state_dict(), "snake.pth.tar")
+    plt.plot(xs, gen_fitness)
+    plt.show()
 
 def train_loop(model):
     keys = {0: "R", 1: "L", 2: "D", 3: "U", 4: "E"}

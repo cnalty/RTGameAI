@@ -10,7 +10,6 @@ class LookModel8(nn.Module):
         # Looks in 8 directions dist to object, 2nd 8 if object is apple, 3rd 8 if object is tail
         self.fc1 = nn.Linear(24, 18)
         self.fc2 = nn.Linear(18, 18)
-        #self.fc3 = nn.Linear(6, 6)
         self.fc4 = nn.Linear(18, 4) # 4 directions for output layer
 
         self.fitness = 0
@@ -24,8 +23,6 @@ class LookModel8(nn.Module):
         out = F.leaky_relu(out)
         out = self.fc2(out)
         out = F.leaky_relu(out)
-        #out = self.fc3(out)
-        #out = F.leaky_relu(out)
         out = self.fc4(out)
 
         return out
@@ -38,6 +35,7 @@ class LookModel8(nn.Module):
             saw = self.look(dir, move_size, body, apple)
             directions.extend(saw)
 
+        #print(directions)
         input = torch.tensor(directions)
 
         moves = self.forward(input)
@@ -59,15 +57,16 @@ class LookModel8(nn.Module):
         return moves
 
     def look(self, dir, move_size, body, apple):
-        max = 20
+
         pos = list(body[-1])
         dist = 1
-        while(pos[0] >= 0 and pos[0] < 800 and pos[1] >= 0 and pos[1] < 800):
+        max = 20
+        while(pos[0] > 0 and pos[0] <= 800 and pos[1] > 0 and pos[1] <= 800):
             pos[0] += dir[0] * move_size
             pos[1] += dir[1] * move_size
             for i in range(len(body) - 1):
                 if body[i][0] == pos[0] and body[i][1] == pos[1]:
-                    return [dist / max, 1, 0]
+                    return [ dist / max, 1, 0]
             if apple[0] == pos[0] and apple[1] == pos[1]:
                 return [dist / max, 0, 1]
             dist += 1
@@ -79,11 +78,11 @@ class LookModel8(nn.Module):
         turns = fitness_params[2]
         away = fitness_params[3]
 
-        fitness = score ** 4
+        fitness = 20 * (score - 3)
 
-        fitness += turns
+        fitness += turns * 4
 
-        fitness -= away * 1.5
+        #fitness -= away * away
 
         return fitness
 

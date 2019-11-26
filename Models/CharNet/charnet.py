@@ -1,9 +1,9 @@
-mport torch
+import torch
 from torch import nn
 import torch.nn.functional as F
 
 class CharNet(nn.Module):
-    def __init__(self, out_chars):
+    def __init__(self):
         super(CharNet, self).__init__()
 
         self.conv1 = nn.Conv2d(1, 16, kernel_size=3, padding=1)
@@ -18,7 +18,11 @@ class CharNet(nn.Module):
         self.pool2 = nn.MaxPool2d(2, 2)
 
         self.fc1 = nn.Linear(3136, 3136)
-        self.fc2 = nn.Linear(3136, out_chars)
+        self.fc2 = nn.Linear(3136, 10)
+
+        for param in self.parameters():
+            nn.init.normal_(param.data, 0, 1)
+            param.requires_grad = False
 
     def forward(self, x):
         out = self.conv1(x)

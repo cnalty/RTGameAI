@@ -22,6 +22,7 @@ class Snake():
         self.closeness = 1000
         self.moves_away = 0
         self.moves = 0
+        self.hunger = 0
         self.move_keys = move_keys
         self.game_speed = game_speed
         self.food_im = food_im
@@ -40,6 +41,7 @@ class Snake():
         return ((a_pos[0] - p_pos[0])**2 + (a_pos[1] - p_pos[1])**2)**(0.5)
 
     def see_apple(self):
+
         app_pos = self.apple.get_pos()
         head = self.player.get_head()
         if head[0] == app_pos[0]:
@@ -76,7 +78,7 @@ class Snake():
 
     def game_loop(self):
         while(self.running):
-            if self.moves > 150:
+            if self.hunger > 50:
                 break
             pygame.event.pump()
             input = self.inputs(self.get_image(), self.player.get_pos(), self.apple.get_pos())
@@ -100,9 +102,10 @@ class Snake():
                 self.player.update("S")
 
             self.closeness = min(self.close_apple(), self.closeness)
-
+            self.hunger += 1
             if self.ate_apple():
                 self.player.grow()
+                self.hunger = 0
             if self.is_dead():
                 self.running = False
 
@@ -117,6 +120,7 @@ class Snake():
             if end_dist > start_dist and saw_apple:
                 self.moves_away += 1
             pygame.display.update()
+            #pygame.display.iconify()
             time.sleep(self.game_speed)
 
         pygame.quit()
