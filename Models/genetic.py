@@ -89,7 +89,7 @@ def crossover_2(parents, num_childs, network_class):
     net_size = count_parameters(parents[0])
     for _ in range(num_childs):
         curr_child = network_class()
-        curr_parents = np.random.choice(parents, 2)
+        curr_parents = random.choice(parents, 2)
         for param1, param2, param3 in zip(curr_parents[0].parameters(), curr_parents[1].parameters(),
                                           curr_child.parameters()):
             datas = crossover_layer(param1, param2, param3)
@@ -112,6 +112,37 @@ def crossover_layer(p1, p2, c):
         c = random.choice([p1.data, p2.data])
         #print(c)
         return [c]
+
+
+def random_dict_crossover(parents, num_childs, network_class):
+    children = []
+    for _ in range(num_childs):
+        curr_parents = random.sample(parents, 2)
+        curr_child = network_class()
+        child_state_dict = {}
+        for k, v in curr_parents[0].state_dict().items():
+            val1 = curr_parents[0].state_dict()[k]
+            val2 = curr_parents[1].state_dict()[k]
+            new_vals = random_dict_helper(val1, val2)
+            #print(new_vals)
+            new_torch = torch.tensor(new_vals)
+            child_state_dict[k] = new_torch
+        curr_child.load_state_dict(child_state_dict)
+        children.append(curr_child)
+
+    return children
+
+def random_dict_helper(p1, p2):
+    if len(p1.size()) > 1:
+        size_keeper = []
+        for s1, s2 in zip(p1, p2):
+            size_keeper.append(random_dict_helper(s1, s2))
+        return size_keeper
+    else:
+        vect = []
+        for i in range(len(p1)):
+            vect.append(random.choice([p1[i], p2[i]]))
+        return vect
 
 ''' Takes in a list of agents and a standard deviation to perform a mutation on each agent.
     Each agent receives an adjustment to all its weights given by a gaussian distribution
@@ -139,7 +170,7 @@ def count_parameters(model):
     return sum(p.numel() for p in model.parameters())
 
 
-def main():
+def test_crossover():
     test_layer1 = torch.nn.Linear(10, 2)
     test_layer2 = torch.nn.Linear(10, 2)
     test_child = torch.nn.Linear(10, 2)
@@ -165,6 +196,14 @@ def main():
     for param in test_child.parameters():
         print(param.data)
 
+def main():
+    from Models.LookAround.look8 import LookModel8
+    test_parent = LookModel8()
+    test_parent2 = LookModel8()
+    child = random_dict_crossover([test_parent, test_parent2], 1, LookModel8)
+    print(test_parent.state_dict()['fc1.bias'])
+    print(test_parent2.state_dict()['fc1.bias'])
+    print(child[0].state_dict()['fc1.bias'])
 
 if __name__ == "__main__":
     main()
