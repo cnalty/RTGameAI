@@ -27,16 +27,17 @@ class LookModel8(nn.Module):
 
         return out
 
-    def choose_move(self, image, body, apple):
+    def choose_move(self, image, body, apple, surface):
         directions = []
         move_size = 40
         move_dirs = [(-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (-1, -1), (1, 1)]
         for dir in move_dirs:
-            saw = self.look(dir, move_size, body, apple)
+            saw = self.look(dir, move_size, body, apple, surface)
             directions.extend(saw)
 
         #print(directions)
         input = torch.tensor(directions)
+
 
         moves = self.forward(input)
         moves = list(moves)
@@ -56,21 +57,22 @@ class LookModel8(nn.Module):
         moves.append(False)
         return moves
 
-    def look(self, dir, move_size, body, apple):
-
+    def look(self, dir, move_size, body, apple, surface):
         pos = list(body[-1])
-        dist = 1
+        dist = 0
         max = 20
-        while(pos[0] >= 0 and pos[0] < 800 and pos[1] >= 0 and pos[1] < 800):
+        while pos[0] > 0 and pos[0] < 800 and pos[1] > 0 and pos[1] < 800:
+            dist += 1
             pos[0] += dir[0] * move_size
             pos[1] += dir[1] * move_size
             for i in range(len(body) - 1):
                 if body[i][0] == pos[0] and body[i][1] == pos[1]:
-                    return [1 / dist, 1, 0]
+                    return [dist / max, 1, 0]
             if apple[0] == pos[0] and apple[1] == pos[1]:
-                return [1 / dist, 0, 1]
-            dist += 1
-        return [1 / dist, 0, 0]
+                return [dist / max, 0, 1]
+
+        return [dist / max, 0, 0]
+
 
     def fitness_model(self, fitness_params):
         score = fitness_params[0]
@@ -81,11 +83,11 @@ class LookModel8(nn.Module):
 
         score = min(10, score)
 
-        fitness = 2 ** score
+        fitness = score ** 3
 
-        fitness *= turns ** 1.5
+        fitness += turns
 
-        fitness /= (1 + away) ** 1.5
+        fitness -= away ** 1.5
 
         return fitness
 

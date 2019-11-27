@@ -89,7 +89,7 @@ def crossover_2(parents, num_childs, network_class):
     net_size = count_parameters(parents[0])
     for _ in range(num_childs):
         curr_child = network_class()
-        curr_parents = random.choice(parents, 2)
+        curr_parents = random.sample(parents, 2)
         for param1, param2, param3 in zip(curr_parents[0].parameters(), curr_parents[1].parameters(),
                                           curr_child.parameters()):
             datas = crossover_layer(param1, param2, param3)
@@ -144,9 +144,33 @@ def random_dict_helper(p1, p2):
             vect.append(random.choice([p1[i], p2[i]]))
         return vect
 
-
+# crossover cut in each layer
 def flat_crossover(parents, num_childs, network_class):
-    pass
+    children = []
+    for _ in range(num_childs):
+        curr_child = network_class()
+        curr_parents = random.sample(parents, 2)
+        for param1, param2, param3 in zip(curr_parents[0].parameters(), curr_parents[1].parameters(),
+                                          curr_child.parameters()):
+            layer_shape = param1.data.size()
+            flat1 = param1.data.view(-1)
+            flat2 = param2.data.view(-1)
+            flatc = param3.data.view(-1)
+
+            cut = random.randint(0, len(flat1))
+
+            for j in range(len(flat1)):
+                if j <= cut:
+                    flatc[j] = flat1[j]
+                else:
+                    flatc[j] = flat2[j]
+
+            flatc = flatc.view(layer_shape)
+
+            param3.data = flatc
+        children.append(curr_child)
+
+    return children
 
 ''' Takes in a list of agents and a standard deviation to perform a mutation on each agent.
     Each agent receives an adjustment to all its weights given by a gaussian distribution
@@ -207,12 +231,19 @@ def test_crossover():
 
 def main():
     from Models.LookAround.look8 import LookModel8
-    test_layer = torch.nn.Linear(4, 4)
+    test_layer1 = torch.nn.Linear(4, 4)
+    test_layer2 = torch.nn.Linear(4, 4)
 
-    for param in test_layer.parameters():
-        print(param)
-        mutate_layer(param, 0.2, 1, True)
-        print(param)
+    class test_class(torch.nn.Module):
+        def __init__(self):
+            super(test_class, self).__init__()
+            self.fc1 = torch.nn.Linear(4, 4)
+
+
+    childs = flat_crossover([test_layer1, test_layer2], 1, test_class)
+    for param1, param2 in zip(test_layer1.parameters(), childs[0].parameters()):
+        print(param1)
+        print(param2)
 
 if __name__ == "__main__":
     main()

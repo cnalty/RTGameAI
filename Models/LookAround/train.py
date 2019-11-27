@@ -15,28 +15,20 @@ def main():
 
     for gen in range(100):
         print("---------" + str(gen) + "---------")
-        for i in range(int((len(curr_models) + 1) / num_threads)):
-            threads = []
-            for j in range(num_threads):
-                x = threading.Thread(target=train_loop(curr_models[i*num_threads + j]))
-                threads.append(x)
-            for j in range(len(threads)):
-                threads[j].start()
-            for j in range(len(threads)):
-                threads[j].join()
-
+        for i in range(len(curr_models)):
+           train_loop(curr_models[i])
 
         fitnesses = [x.fitness for x in curr_models]
-        list.sort(fitnesses)
+        #list.sort(fitnesses)
         gen_fitness.append(sum(fitnesses)/float(len(fitnesses)))
 
-        winners = genetic.select_agents(fitnesses, 0.05)
+        winners = genetic.select_agents(fitnesses, 0.2)
         print(winners)
         win_models = [curr_models[winners[i][0]] for i in range(len(winners))]
         best = win_models[-1]
-        new_models = genetic.crossover(win_models, pop_size - 1, LookModel8)
+        new_models = genetic.crossover_2(win_models, pop_size - 1, LookModel8)
 
-        genetic.mutate_agents(new_models, 0.2, 0.02)
+        genetic.mutate_agents(new_models, 0.2, 0.01)
         new_models.append(best)
         curr_models = new_models
         xs = [i for i in range(len(gen_fitness))]

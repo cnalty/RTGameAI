@@ -76,12 +76,36 @@ class Snake():
     def get_image(self):
         return pygame.surfarray.array3d(self.surface)
 
+    def look(self, dir, move_size, body, apple, surface):
+
+        pos = list(body[-1])
+        dist = 0
+        max = 20
+        import pygame
+        while pos[0] >= 0 and pos[0] < 800 and pos[1] >= 0 and pos[1] < 800:
+
+            pygame.draw.circle(surface, (255, 0, 0), pos, 3)
+            dist += 1
+            pos[0] += dir[0] * move_size
+            pos[1] += dir[1] * move_size
+            for i in range(len(body) - 1):
+                if body[i][0] == pos[0] and body[i][1] == pos[1]:
+
+                    pygame.draw.circle(surface, (0, 255, 0), pos, 3)
+                    return [1 / (dist + 1), 1, 0]
+            if apple[0] == pos[0] and apple[1] == pos[1]:
+                pygame.draw.circle(surface, (0, 0, 255), pos, 3)
+                return [1 / (dist + 1), 0, 1]
+        if dist == 0:
+            pygame.draw.circle(surface, (255, 255, 255), pos, 3)
+        return [1 / (dist + 1), 0, 0]
+
     def game_loop(self):
         while(self.running):
-            if self.hunger > 50:
+            if self.hunger > 120:
                 break
             pygame.event.pump()
-            input = self.inputs(self.get_image(), self.player.get_pos(), self.apple.get_pos())
+            input = self.inputs(self.get_image(), self.player.get_pos(), self.apple.get_pos(), self.surface)
             saw_apple = self.see_apple()
             start_dist = self.dist(self.player.get_head(), self.apple.get_pos())
             # K_LEFT = 276
@@ -107,12 +131,15 @@ class Snake():
                 self.player.grow()
                 self.hunger = 0
             if self.is_dead():
-                self.running = False
+                break
 
             self.surface.fill((0,0,0))
             self.player.draw(self.surface)
             self.apple.draw(self.surface)
             #self.draw_lines()
+            move_dirs = [(-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (-1, -1), (1, 1)]
+            for dir in move_dirs:
+                self.look(dir, 40, self.player.get_pos(), self.apple.get_pos(), self.surface)
             pygame.display.flip()
 
             self.moves += 1
