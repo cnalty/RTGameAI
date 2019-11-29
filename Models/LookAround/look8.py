@@ -13,6 +13,10 @@ class LookModel8(nn.Module):
         self.fc4 = nn.Linear(18, 4) # 4 directions for output layer
 
         self.fitness = 0
+        self.diversity = 0
+        self.frank = 0
+        self.drank = 0
+        self.rank = 0
 
         for param in self.parameters():
             nn.init.uniform_(param.data, -1, 1)
