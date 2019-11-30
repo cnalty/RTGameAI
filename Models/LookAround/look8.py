@@ -9,7 +9,6 @@ class LookModel8(nn.Module):
 
         # Looks in 8 directions dist to object, 2nd 8 if object is apple, 3rd 8 if object is tail
         self.fc1 = nn.Linear(24, 18)
-        self.fc2 = nn.Linear(18, 18)
         self.fc4 = nn.Linear(18, 4) # 4 directions for output layer
 
         self.fitness = 0
@@ -24,8 +23,6 @@ class LookModel8(nn.Module):
 
     def forward(self, x):
         out = self.fc1(x)
-        out = F.leaky_relu(out)
-        out = self.fc2(out)
         out = F.leaky_relu(out)
         out = self.fc4(out)
 
@@ -87,11 +84,11 @@ class LookModel8(nn.Module):
 
         score = min(10, score)
 
-        fitness = score ** 3
+        fitness = 2 ** score
 
         fitness += turns
 
-        fitness -= away ** 1.5
+        fitness -= away ** 2
 
         return fitness
 
