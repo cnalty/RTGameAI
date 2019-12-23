@@ -4,7 +4,7 @@ from torch.autograd import Variable
 from Games.MNIST.dataset import Mnist_Dataset
 from Models.CharNet.charnet import CharNet
 import torch.optim.lr_scheduler
-import Models.genetic as genetic
+import Models.genetic_old as genetic
 
 BATCH_SIZE = 512
 NUM_EPOCHS = 30

@@ -1,4 +1,4 @@
-import Models.genetic2 as genetic
+import Models.genetic as genetic
 from Models.AnimalNet.animal_net import AnimalNet
 from Games.HungrySquares.world import World
 import torch

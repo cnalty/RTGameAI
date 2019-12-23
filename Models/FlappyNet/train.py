@@ -1,4 +1,4 @@
-import Models.genetic2 as genetic
+import Models.genetic as genetic
 from Models.FlappyNet.flappy_net import FlappyNet
 from Games.FlappyDot.world import World
 import torch

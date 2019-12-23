@@ -1,4 +1,4 @@
-import Models.genetic as genetic
+import Models.genetic_old as genetic
 import torch
 from Models.ConvNet.convnet import ConvNet
 from Games.Snake import game

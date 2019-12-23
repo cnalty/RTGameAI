@@ -1,4 +1,4 @@
-import Models.genetic2 as genetic
+import Models.genetic as genetic
 import torch
 from Models.LookAround.look import LookModel
 from Models.LookAround.look8 import LookModel8
